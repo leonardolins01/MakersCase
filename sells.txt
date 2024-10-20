@@ -1,3 +1,6 @@
 1, Apple MacBook Pro, $2499, Apple M2, Integrated 10-core GPU, 20 hours
 1, Asus ZenBook 13, $999, AMD Ryzen 7 5800U, Integrated Radeon Graphics, 16 hours
 1, Asus ROG Zephyrus G14, $1499, AMD Ryzen 9 5900HS, NVIDIA GeForce RTX 3060, 10 hours, Asus
+1, Apple MacBook Pro, $2499, Apple M2 processor, Integrated 10-core GPU, with a battery life of 20 hours, Apple
+1, Apple MacBook Pro, $2499, Apple M2, Integrated 10-core GPU, 20 hours, Apple
+1, Asus ROG Zephyrus G14, $1499, AMD Ryzen 9 5900HS, NVIDIA GeForce RTX 3060, 10 hours, Asus

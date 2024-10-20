@@ -21,7 +21,7 @@ const app = express();
 
 // API key for OpenAI
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || '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',
+    apiKey: process.env.OPENAI_API_KEY || '',
 });
 
 // Middleware for static files and JSON body parsing
