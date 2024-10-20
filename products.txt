@@ -1,0 +1,13 @@
+quantity, name, price, processor, graphics card, battery life
+10, Apple MacBook Pro, $2499, Apple M2, Integrated 10-core GPU, 20 hours
+5, Dell XPS 13, $1399, Intel Core i7-1250U, Intel Iris Xe, 12 hours
+7, HP Spectre x360, $1599, Intel Core i7-1260P, Intel Iris Xe, 15 hours
+8, Acer Predator Helios 300, $1799, Intel Core i7-12700H, NVIDIA GeForce RTX 3070, 6 hours
+12, Samsung Galaxy Book Pro, $1199, Intel Core i5-1135G7, Intel Iris Xe, 20 hours
+6, Asus ROG Zephyrus G14, $1499, AMD Ryzen 9 5900HS, NVIDIA GeForce RTX 3060, 10 hours
+4, Apple MacBook Air, $999, Apple M1, Integrated 7-core GPU, 18 hours
+9, Dell Inspiron 15, $799, Intel Core i5-11300H, Intel Iris Xe, 10 hours
+3, HP Omen 16, $1699, Intel Core i7-11800H, NVIDIA GeForce RTX 3060, 8 hours
+5, Acer Aspire 5, $649, Intel Core i3-1115G4, Intel UHD, 8 hours
+2, Samsung Notebook 9 Pro, $1199, Intel Core i7-8565U, Intel UHD Graphics 620, 14 hours
+8, Asus ZenBook 13, $999, AMD Ryzen 7 5800U, Integrated Radeon Graphics, 16 hours

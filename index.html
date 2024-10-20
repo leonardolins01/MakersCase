@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Chat Interface</title>
+		<!-- Bootstrap CSS -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+		<!-- Custom CSS -->
+		<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="chat-container">
+		<!-- Chat Header -->
+		<div class="chat-header">
+				Conversa
+		</div>
+
+		<!-- Chat Messages -->
+		<div class="chat-messages" id="chat-messages">
+				<!-- Example Messages -->
+				<div class="message sent">
+						<div class="message-text">
+								Let's start!!
+						</div>
+				</div>
+				<div class="message received">
+						<div class="message-text">
+								How can I help you today?
+						</div>
+				</div>
+		</div>
+
+		<!-- Chat Input -->
+		<div class="chat-input d-flex">
+				<textarea id="message-input" rows="1" placeholder="Digite uma mensagem..."></textarea>
+				<button id="send-btn">&#9658;</button>
+		</div>
+</div>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JavaScript -->
+<script src="script.js"></script>
+</body>
+</html>
