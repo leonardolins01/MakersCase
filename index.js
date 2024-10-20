@@ -1,127 +1,51 @@
-// Carregar variáveis de ambiente
-require('dotenv').config();
+// Import dependencies using ESM syntax
+import 'dotenv/config'; // Substitui require('dotenv').config();
+import express from 'express';
+import path from 'path';
+import bodyParser from 'body-parser';
+import fs from 'fs';
+import { OpenAI } from 'openai';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-// Importar dependências
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
-const fs = require('fs');
-const OpenAI = require('openai');
+// Import custom utilities
+import { loadProductInfo, processConfirmation, processYes, recordSale, lastSaleData } from './utils.js';
+
+// Set up __dirname in ESM (necessary since __dirname is not defined in ESM by default)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Initialize Express
 const app = express();
 
-let lastSaleData = null;
-
-// Configurar a chave da API do OpenAI
+// API key for OpenAI
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY || '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',
 });
 
-// Função para carregar o conteúdo do arquivo products.txt
-function loadProductInfo() {
-    try {
-        const data = fs.readFileSync(path.join(__dirname, 'products.txt'), 'utf8');
-        return data; // Retorna o conteúdo do arquivo como uma string
-    } catch (err) {
-        console.error('Erro ao ler o arquivo products.txt:', err);
-        return ''; // Se ocorrer um erro, retorna uma string vazia
-    }
-}
-
-// Função para registrar vendas no arquivo sells.txt no mesmo formato do arquivo products.txt
-function recordSale(product, quantitySold) {
-    // Formatação da venda no estilo de products.txt
-    const saleInfo = `${quantitySold}, ${product.name}, $${product.price}, ${product.processor}, ${product.graphics_card}, ${product.battery_life}\n`;
-
-    try {
-        // Usar 'fs.appendFileSync' para adicionar a venda ao arquivo sells.txt
-        fs.appendFileSync(path.join(__dirname, 'sells.txt'), saleInfo, 'utf8');
-        console.log('Venda registrada com sucesso!');
-    } catch (error) {
-        console.error('Erro ao registrar a venda:', error);
-    }
-}
-
-// Função para verificar se a resposta do GPT começa com "Confirmation" e extrair informações
-function processConfirmation(response) {
-    if (response.startsWith("Confirmation")) {
-        // Atualizar o regex para capturar o formato correto da mensagem de confirmação
-        const regex = /Confirmation: Do you confirm the purchase of: ([\w\s]+), \$([\d.,]+), ([\w\s]+), ([\w\s-]+), ([\w\s]+)\?/;
-        const match = response.match(regex);
-
-        if (match) {
-            // Capturar as informações da venda
-            const product = {
-                name: match[1],
-                price: parseFloat(match[2].replace(',', '')),
-                processor: match[3],
-                graphics_card: match[4],
-                battery_life: match[5],
-            };
-
-            // Armazenar as informações da venda para uso posterior, com quantidade padrão de 1
-            lastSaleData = { product, quantity: 1 };
-            return true;  // Indicar que a venda foi processada
-        }
-    }
-    return false;  // Nenhuma confirmação de venda foi processada
-}
-
-// Função para verificar se a resposta do usuário começa com "yes" e ativar a função recordSale
-function processYes(userResponse) {
-    if (userResponse.trim().toLowerCase().startsWith('yes')) {
-        if (lastSaleData) {
-            // Chamar a função recordSale com os dados armazenados
-            const { product, quantity } = lastSaleData;
-            recordSale(product, quantity);
-            lastSaleData = null; // Limpar os dados após a venda ser registrada
-            return "Sale confirmed and recorded.";
-        } else {
-            return "No sale data available to record.";
-        }
-    }
-    return "Sale not confirmed.";
-}
-
-// Middleware para servir arquivos estáticos (HTML, CSS, JS)
+// Middleware for static files and JSON body parsing
 app.use(express.static(path.join(__dirname)));
 app.use(bodyParser.json());
 
-// Rota principal para exibir o frontend (index.html)
+// Serve the main HTML file
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Endpoint para lidar com o envio de mensagens do frontend e responder usando a API do ChatGPT
+// Endpoint to process chat messages
 app.post('/chat', async (req, res) => {
-    // Log para verificar se o corpo da requisição foi recebido corretamente
-    console.log("Received request body:", req.body);
-
     const { prompt } = req.body;
-
-    // Log para verificar se o prompt foi extraído corretamente
-    console.log(prompt);
-
-    // Chamar a função processYes e verificar o resultado
     const sellResponse = processYes(prompt);
-    console.log("Result of processYes:", sellResponse);
 
-    if (sellResponse === "Sale confirmed and recorded.") {
-        // Se a venda for confirmada, envie a resposta de confirmação e não chame o ChatGPT
-        console.log("Sale confirmed, sending response:", sellResponse);
+    if (sellResponse === "Sale confirmed. Can I help you with anything else?") {
+        // If the user confirmed the sale, record the sale and don't send the message to OpenAI
         res.json({ reply: sellResponse });
         return;
     }
 
-    // Log para verificar se chegamos até aqui, ou seja, o ChatGPT precisa ser chamado
-    console.log("Calling ChatGPT...");
-
-    // Carregar as informações dos produtos
     const productInfo = loadProductInfo();
-    console.log("Loaded product info:", productInfo);
 
-    // Modificar o prompt para incluir as informações dos produtos
     const modifiedPrompt = `
-    
     don't you any word modification in the response like bold, italic, underline, etc.
     
     Here is the information about products that you can access: ${productInfo}
@@ -134,47 +58,36 @@ app.post('/chat', async (req, res) => {
 
     Always provide a maximum of 2 product suggestions per response.
 
-    When the customer wants to buy a product, confirm with the following: "Confirmation: Do you confirm the purchase of: [name], [price], [processor], [graphics card], [battery life]? Please answer yes or no."
+    When the customer wants to buy a product, just say the confirm message without any other information, dont send the quotes: "Confirmation: Do you confirm the purchase of: [name], [price], [processor], [graphics card], [battery life]? Please answer yes or no."
     
     In case of the customer confirming the purchase thank him and offer help with later purchases
     
-    User's question: ${prompt}
+    if the client says "yes" just thank him and ask if he needs help with anything else
     
+    if the client say "yes" and you don't have any information just say "ok, can I help you with anything else?"
+    
+    User's question: ${prompt}
   `;
 
     try {
-        // Chamar a API do OpenAI e logar a requisição
-        console.log("Sending request to OpenAI API with modifiedPrompt...");
-
         const response = await openai.chat.completions.create({
-            model: "gpt-4o",
+            model: "gpt-3.5-turbo", // Use GPT-3.5 model if you meant "gpt-4o" as GPT-4.
             messages: [{ role: "user", content: modifiedPrompt }],
         });
 
-        // Log para verificar a resposta do ChatGPT
-        console.log("Received response from OpenAI:", response);
-
         const chatResponse = response.choices[0].message.content;
-        console.log("Extracted chatResponse:", chatResponse);
-
-        // Verificar se a resposta começa com "Confirmation" e processar
         const isConfirmed = processConfirmation(chatResponse);
-        console.log("Result of processConfirmation:", isConfirmed);
 
-        // Enviar a resposta do ChatGPT de volta ao frontend
-        console.log("Sending final reply to frontend:", chatResponse);
         res.json({ reply: chatResponse });
 
     } catch (error) {
-        console.error("Erro ao chamar a API:", error);
+        console.error("Error to call the API:", error);
         res.status(500).json({ error: 'Solicitation Error' });
     }
 });
 
-
-// Definir a porta e iniciar o servidor
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
