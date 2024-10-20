@@ -22,9 +22,11 @@ function loadProductInfo() {
 
 // Function to register sales in the sells.txt file in the same format as the products.txt file
 function recordSale(product, quantitySold) {
-    const saleInfo = `${quantitySold}, ${product.name}, $${product.price}, ${product.processor}, ${product.graphics_card}, ${product.battery_life}\n`;
+    // Formatação da venda, incluindo o parâmetro "company" no final
+    const saleInfo = `${quantitySold}, ${product.name}, $${product.price}, ${product.processor}, ${product.graphics_card}, ${product.battery_life}, ${product.company}\n`;
 
     try {
+        // Registrar a venda no arquivo sells.txt
         fs.appendFileSync(path.join(__dirname, 'sells.txt'), saleInfo, 'utf8');
         console.log('Registration successful!');
     } catch (error) {
@@ -32,7 +34,7 @@ function recordSale(product, quantitySold) {
     }
 }
 
-// Function to check if the GPT response starts with "Confirmation" and extract information
+
 function processConfirmation(response) {
     if (response.startsWith("Confirmation")) {
         // Use Regex
@@ -40,21 +42,27 @@ function processConfirmation(response) {
         const match = response.match(regex);
 
         if (match) {
-            // Capture information
+            // Capturar o nome do produto
+            const name = match[1];
+            // Capturar a primeira palavra do nome como a "company"
+            const company = name.split(' ')[0]; // Divide a string e pega a primeira palavra
+
+            // Capturar as demais informações
             const product = {
-                name: match[1],
+                name: name,
                 price: parseFloat(match[2].replace(',', '')),
                 processor: match[3],
                 graphics_card: match[4],
                 battery_life: match[5],
+                company: company  // Adiciona a empresa com base na primeira palavra do nome
             };
 
-            // Store the sale information for later use, with a default quantity of 1
+            // Armazenar as informações da venda para uso posterior, com uma quantidade padrão de 1
             lastSaleData = { product, quantity: 1 };
-            return true;  // Indicate that the sale was processed
+            return true;  // Indica que a venda foi processada
         }
     }
-    return false;  // No sale confirmation was processed
+    return false;  // Nenhuma confirmação de venda foi processada
 }
 
 // Function to process the user response to confirm the sale
