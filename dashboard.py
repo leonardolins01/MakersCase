@@ -11,13 +11,13 @@ def read_data_from_txt(file_path):
     data = [line.strip().split(', ') for line in lines[1:]]
     
     # Create a DataFrame with the relevant columns (converting price to numeric, remove $)
-    df = pd.DataFrame(data, columns=['Quantity', 'Company', 'Name', 'Price', 'Processor', 'Graphics Card', 'Battery Life'])
+    df = pd.DataFrame(data, columns=['Quantity', 'Name', 'Price', 'Processor', 'Graphics Card', 'Battery Life', 'Company'])
     df['Quantity'] = pd.to_numeric(df['Quantity'])
     df['Price'] = pd.to_numeric(df['Price'].str.replace('$', ''))
     return df
 
 # Step 2: Load the data from the text file
-file_path = 'sales.txt'
+file_path = 'sells.txt'
 df = read_data_from_txt(file_path)
 
 # Calculate total sales for each product

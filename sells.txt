@@ -1,0 +1,1 @@
+${quantitySold}, ${product.name}, ${product.price}, ${product.processor}, ${product.graphics_card}, ${product.battery_life}, ${product.Company}
